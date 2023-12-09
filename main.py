@@ -7,6 +7,8 @@ import time
 from mobsfpy import MobSF
 import console_explorer
 
+from file_manager import run_file_manager
+
 mobsf = MobSF('117a684b67789264547447f1567daf8e5ea7d18ba12b4bf605673680f10d8624')
 
 __author__ = 'szymmoc895 ( @szymmoc895) '
@@ -40,7 +42,8 @@ def get_apk_name():
     print(f"apk name: {apk_name}")
 
 def get_apk_path():
-    file_path = console_explorer.browse_for_file()
+    file_path = run_file_manager()
+    print(file_path)
 
 def run_emulator():
     #os.system("emulator -avd Pixel_2_API_29 &")
@@ -66,7 +69,7 @@ def run_drozer():
 
 def run_mobsf():
     os.system('gnome-terminal -x sudo docker run -it --rm -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest')
-    mobsf.upload
+    #mobsf.upload
 
 def main():
     

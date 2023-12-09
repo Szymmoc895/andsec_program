@@ -17,6 +17,8 @@ EDITOR = os.getenv("EDITOR") if os.getenv("EDITOR") else "editor"
 
 MEDIA_OPEN = "open" if platform.system() == "Darwin" else "xdg-open"
 
+item_path = ""
+
 
 # keypresses
 OPEN_KEYS = (curses.KEY_ENTER, ord('\n'), curses.KEY_RIGHT, ord('l'))
@@ -188,10 +190,11 @@ def file_options(item, screen):
 
     cursor = 0
     
+    
     mime = mimetypes.guess_type(f"{cd}/{item.f_name}")[0]
     if mime: mime = mime.partition('/')[0].lower()
 
-    options = ["View File", "Edit File", "Delete File", "Rename File", "Open File with Command"]
+    options = ["Choose File", "View File", "Edit File", "Delete File", "Rename File", "Open File with Command"]
     if mime in FileType.F_MEDIA_MIMES:
         options.remove("Edit File") # cannot edit media files
 
@@ -269,7 +272,12 @@ def file_options(item, screen):
                     screen.clear()
                     screen.refresh()
                     return
-
+            elif "Choose" in options[cursor]:
+                global item_path
+                file_name = item.f_name
+                item_path = cd + "/" + file_name   
+                #print("\n" + item_path)
+                return
             elif "Rename" in options[cursor]:
                 file_name = item.f_name
 
@@ -524,6 +532,35 @@ def help_menu():
             "  -v, --verion\t\tPrint the version and exit\n"
             )
 
+def run_file_manager():
+    screen = curses.initscr()
+    curses.curs_set(0)
+    curses.noecho()
+    screen.keypad(True)
+
+    curses.start_color()
+
+    curses.init_pair(1, curses.COLOR_BLUE, curses.COLOR_BLACK)
+    curses.init_pair(2, curses.COLOR_CYAN, curses.COLOR_BLACK)
+    curses.init_pair(3, curses.COLOR_GREEN, curses.COLOR_BLACK)
+    curses.init_pair(4, curses.COLOR_MAGENTA, curses.COLOR_BLACK)
+    curses.init_pair(5, curses.COLOR_YELLOW, curses.COLOR_BLACK)
+    curses.init_pair(6, curses.COLOR_RED, curses.COLOR_BLACK)
+    curses.init_pair(7, curses.COLOR_WHITE, curses.COLOR_BLACK)
+
+    try:
+        scroll(screen)
+    except KeyboardInterrupt:
+        pass
+
+    screen.clear()
+    screen.refresh()
+
+    curses.echo()
+    curses.curs_set(1)
+    curses.endwin()
+    
+    return item_path
 
 if __name__ == "__main__":
     if len(argv) > 1:
