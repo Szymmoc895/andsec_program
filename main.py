@@ -6,10 +6,12 @@ from subprocess import call
 import time
 from mobsfpy import MobSF
 import console_explorer
+from subprocess import check_output
+import requests
 
 from file_manager import run_file_manager
 
-mobsf = MobSF('117a684b67789264547447f1567daf8e5ea7d18ba12b4bf605673680f10d8624')
+mobsf = MobSF('64dfc59be4fb79b25d4f1dbd9e015fecdbc159ee76c2c7273a0fdcc949a9d028')
 
 __author__ = 'szymmoc895 ( @szymmoc895) '
 
@@ -40,10 +42,12 @@ Welcome to Automated Android Security Testing Platform
 def get_apk_name():
     apk_name = typer.prompt("What's your application name?")
     print(f"apk name: {apk_name}")
+    return apk_name
 
 def get_apk_path():
     file_path = run_file_manager()
     print(file_path)
+    return file_path
 
 def run_emulator():
     #os.system("emulator -avd Pixel_2_API_29 &")
@@ -67,9 +71,33 @@ def run_drozer():
     time.sleep(3)
     os.system('python3 scanme.py') # tutaj przekopiować kod z scanme i go wywoływać
 
+def check_mobsf_status():
+    url = "http://127.0.0.1:8000"  # Zmodyfikuj, jeśli MobSF słucha na innym porcie lub adresie
+    try:
+        response = requests.get(url)
+        if response.status_code == 200:
+            return True
+        else:
+            return False
+    except requests.ConnectionError:
+        return False
+
 def run_mobsf():
     os.system('gnome-terminal -x sudo docker run -it --rm -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest')
-    #mobsf.upload
+    #mobsf.upload('/home/andsec/Downloads/InsecureShop.apk')
+    #mobsf.scan('apk', 'InsecureShop.apk', 'c5d872355e43322f1692288e2c4e6f00')
+    #hash = check_output(args='md5sum /home/andsec/Downloads/InsecureShop.apk', shell=True).decode().split(' ')[0]
+    #print(hash)
+    while(check_mobsf_status() == False):
+        time.sleep(3)
+        if check_mobsf_status():
+            print("MobSF jest uruchomiony.")
+        else:
+            print("MobSF nie jest uruchomiony.")
+    path_to_file = get_apk_path()
+    mobsf.upload(path_to_file)
+    hash = check_output(args=f'md5sum {path_to_file}', shell=True).decode().split(' ')[0]
+    mobsf.scan('apk', get_apk_name(), hash)
 
 def main():
     
@@ -77,7 +105,8 @@ def main():
     #get_apk_name()
     #run_emulator()
     #set_proxy()
-    get_apk_path()
+    #get_apk_path()
+    run_mobsf()
 
 main()
 
