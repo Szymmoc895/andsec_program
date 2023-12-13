@@ -1,3 +1,4 @@
+import json
 import typer
 import inquirer
 import os
@@ -91,13 +92,17 @@ def run_mobsf():
     while(check_mobsf_status() == False):
         time.sleep(3)
         if check_mobsf_status():
-            print("MobSF jest uruchomiony.")
+            print("MobSF is read.")
         else:
-            print("MobSF nie jest uruchomiony.")
+            print("MobSF is not ready.")
     path_to_file = get_apk_path()
     mobsf.upload(path_to_file)
     hash = check_output(args=f'md5sum {path_to_file}', shell=True).decode().split(' ')[0]
     mobsf.scan('apk', get_apk_name(), hash)
+    mobsf.report_pdf(hash)
+    with open('data.json', 'w', encoding='utf-8') as f:
+        json.dump(mobsf.report_json(hash), f, ensure_ascii=False, indent=4)
+    print('Scan completed!')
 
 def main():
     
