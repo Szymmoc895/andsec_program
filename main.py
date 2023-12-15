@@ -111,7 +111,8 @@ def main():
     #run_emulator()
     #set_proxy()
     #get_apk_path()
-    run_mobsf()
+    #run_mobsf()
+    run_emulator()
 
 main()
 
