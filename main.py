@@ -1,6 +1,7 @@
 import json
 import typer
 import inquirer
+from inquirer.themes import BlueComposure
 import os
 from rich import print
 from subprocess import call
@@ -40,6 +41,39 @@ Welcome to Automated Android Security Testing Platform
     print(f"[bold red]{__bannner__}[/bold red]")
     print("\n")
 
+def what_tool():
+    questions = [
+    inquirer.Checkbox(
+        "tools",
+        message="What tools do you want to use?",
+        choices=["Trufflehog", "Drozer", "RTS", "MobSF", "MITM", "Just Android Emulator", "Others"],
+        default=["Just Android Emulator"],
+    ),
+    ]
+
+    answers = inquirer.prompt(questions)
+    print(answers)
+    if 'Trufflehog' in answers["tools"]:
+        print('yes')
+        trufflehog()
+
+def trufflehog():
+    q = [
+        inquirer.Checkbox(
+            "gitOrLocal",
+            message="Do You want to scan Ur local or github repo?",
+            choices=["Local", "Github"],
+            default=["Local"],
+        ),
+    ]
+    ans = inquirer.prompt(q, theme=BlueComposure())
+    if 'Local' in ans['gitOrLocal']:
+        os.system('trufflehog git fileh:///ome/andsec/Documents/testing_software/zmitacinema/ZMiTACinema')
+    if 'Github' in ans['gitOrLocal']:
+        os.system('trufflehog git https://github.com/StartupZmitac/ZMiTACinema.git --no-update')
+    if not ans['gitOrLocal']:
+        print("No options have been choosen")
+    
 def get_apk_name():
     apk_name = typer.prompt("What's your application name?")
     print(f"apk name: {apk_name}")
@@ -112,7 +146,8 @@ def main():
     #set_proxy()
     #get_apk_path()
     #run_mobsf()
-    run_emulator()
+    #run_emulator()
+    what_tool()
 
 main()
 
