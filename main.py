@@ -10,6 +10,7 @@ from mobsfpy import MobSF
 import console_explorer
 from subprocess import check_output
 import requests
+import sys
 
 from file_manager import run_file_manager
 
@@ -68,12 +69,21 @@ def trufflehog():
     ]
     ans = inquirer.prompt(q, theme=BlueComposure())
     if 'Local' in ans['gitOrLocal']:
-        os.system('trufflehog git fileh:///ome/andsec/Documents/testing_software/zmitacinema/ZMiTACinema')
+        path = get_repo_path()
+        os.system(f'trufflehog git file://{path} --json | jq . >> "trufflehog_report_local.json"')
+        os.system("gedit trufflehog_report_local.json")
     if 'Github' in ans['gitOrLocal']:
-        os.system('trufflehog git https://github.com/StartupZmitac/ZMiTACinema.git --no-update')
+        os.system('trufflehog git https://github.com/StartupZmitac/ZMiTACinema.git --no-update --json | jq . >> "trufflehog_report_github.json')
+        os.system("gedit trufflehog_report_github.json")
     if not ans['gitOrLocal']:
         print("No options have been choosen")
-    
+
+def get_repo_path():
+    question = inquirer.Path("directory", path_type=inquirer.Path.DIRECTORY, message="What is Ur repo's directory?"),
+    repo_path = inquirer.prompt(question)
+    print(repo_path['directory']) 
+    return repo_path['directory']
+
 def get_apk_name():
     apk_name = typer.prompt("What's your application name?")
     print(f"apk name: {apk_name}")
@@ -148,6 +158,7 @@ def main():
     #run_mobsf()
     #run_emulator()
     what_tool()
+    #get_repo_path()
 
 main()
 
