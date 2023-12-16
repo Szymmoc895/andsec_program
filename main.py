@@ -7,10 +7,8 @@ from rich import print
 from subprocess import call
 import time
 from mobsfpy import MobSF
-import console_explorer
 from subprocess import check_output
 import requests
-import sys
 
 from file_manager import run_file_manager
 
@@ -47,16 +45,22 @@ def what_tool():
     inquirer.Checkbox(
         "tools",
         message="What tools do you want to use?",
-        choices=["Trufflehog", "Drozer", "RTS", "MobSF", "MITM", "Just Android Emulator", "Others"],
+        choices=["Trufflehog", "Drozer", "RMS(Runtime-Mobile-Security)", "MobSF", "MITM", "Just Android Emulator", "Others"],
         default=["Just Android Emulator"],
     ),
     ]
 
     answers = inquirer.prompt(questions)
     print(answers)
-    if 'Trufflehog' in answers["tools"]:
-        print('yes')
-        trufflehog()
+    # if 'Trufflehog' in answers["tools"]:
+    #     trufflehog()
+    if 'Drozer' in answers["tools"]:
+        run_drozer()
+    if 'RMS(Runtime-Mobile-Security)' in answers["tools"]:
+        run_RMS()
+    if "MobSF" in answers["tools"]:
+        run_mobsf()
+    
 
 def trufflehog():
     q = [
@@ -100,6 +104,7 @@ def run_emulator():
     os.system("adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'")
     #while [ "`adb shell getprop sys.boot_completed | tr -d '\r' `" != "1" ] ; do sleep 1; done
     print("koniec bootowania")
+    time.sleep(10)
 
 def check_if_ready():
     print('start')
@@ -111,9 +116,10 @@ def set_proxy():
 
 def run_drozer():
     os.system('adb forward tcp:31415 tcp:31415')
-    os.system('drozer console connect')
     os.system('adb shell monkey -p com.mwr.dz -v 1')
     time.sleep(3)
+    #os.system('gnome-terminal -- drozer console connect')
+    #time.sleep(3)
     os.system('python3 scanme.py') # tutaj przekopiować kod z scanme i go wywoływać
 
 def check_mobsf_status():
@@ -148,17 +154,23 @@ def run_mobsf():
         json.dump(mobsf.report_json(hash), f, ensure_ascii=False, indent=4)
     print('Scan completed!')
 
+def run_RMS():
+    run_emulator()
+    os.system('rms')
+
 def main():
     
     #welcome()
     #get_apk_name()
     #run_emulator()
     #set_proxy()
+    #run_drozer()
     #get_apk_path()
     #run_mobsf()
     #run_emulator()
-    what_tool()
+    #what_tool()
     #get_repo_path()
+    run_RMS()
 
 main()
 
