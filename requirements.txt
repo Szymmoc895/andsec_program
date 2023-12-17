@@ -1,0 +1,7 @@
+colorama==0.4.4
+inquirer==3.1.4
+mobsfpy.egg==info
+Requests==2.31.0
+rich==13.7.0
+typer==0.9.0
+pytest==7.4.3
