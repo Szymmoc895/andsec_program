@@ -10,7 +10,7 @@ from mobsfpy import MobSF
 from subprocess import check_output
 import requests
 
-from file_manager import run_file_manager
+from .file_manager import run_file_manager
 
 mobsf = MobSF('64dfc59be4fb79b25d4f1dbd9e015fecdbc159ee76c2c7273a0fdcc949a9d028')
 
@@ -120,7 +120,7 @@ def run_drozer():
     time.sleep(3)
     #os.system('gnome-terminal -- drozer console connect')
     #time.sleep(3)
-    os.system('python3 scanme.py') # tutaj przekopiować kod z scanme i go wywoływać
+    os.system('python3 /home/andsec/Documents/program/andsec_program/andsec/scanme.py') # tutaj przekopiować kod z scanme i go wywoływać
 
 def check_mobsf_status():
     url = "http://127.0.0.1:8000"  # Zmodyfikuj, jeśli MobSF słucha na innym porcie lub adresie
@@ -158,7 +158,7 @@ def run_RMS():
     run_emulator()
     os.system('rms')
 
-def main():
+def andsec_main():
     
     #welcome()
     #get_apk_name()
@@ -172,7 +172,7 @@ def main():
     #get_repo_path()
     run_RMS()
 
-main()
+#main()
 
 #if __name__ == "__main__":
 #    typer.run(main)

@@ -3,9 +3,28 @@
 
 from typing import Optional
 import typer
-from andsec import __app_name__, __version__
+from andsec import __app_name__, __version__, welcome, run_emulator, run_drozer
+from typing_extensions import Annotated
+
 
 app = typer.Typer()
+
+@app.command(help="Command to run tools. Type 'run --help' for help.")
+def run(
+    hello: bool = typer.Option(False, help="Run Welcome screen"),
+    emulator: bool = typer.Option(False, help="Run Android emulator"),
+    drozer: bool = typer.Option(False, help="Run Drozer tool"),
+    path: bool = typer.Option(False, help="Give apk path"),
+):
+    if hello:
+        welcome()
+    if emulator:
+        run_emulator()
+    if drozer and not path:
+        raise typer.Exit("--emulator is required when --hello is used")
+    if drozer and path:
+        run_drozer()
+
 
 def _version_callback(value: bool) -> None:
     if value:
