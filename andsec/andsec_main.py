@@ -1,4 +1,5 @@
 import json
+import subprocess
 import typer
 import inquirer
 from inquirer.themes import BlueComposure
@@ -12,7 +13,7 @@ import requests
 
 from .file_manager import run_file_manager
 
-mobsf = MobSF('64dfc59be4fb79b25d4f1dbd9e015fecdbc159ee76c2c7273a0fdcc949a9d028')
+mobsf = MobSF('31cfac3b114d18c2943c4ac2c8554758f8be07f05aa97a84a1f9d40e020eaed3')
 
 __author__ = 'szymmoc895 ( @szymmoc895) '
 
@@ -41,6 +42,7 @@ Welcome to Automated Android Security Testing Platform
     print("\n")
 
 def what_tool():
+    welcome()
     questions = [
     inquirer.Checkbox(
         "tools",
@@ -52,8 +54,8 @@ def what_tool():
 
     answers = inquirer.prompt(questions)
     print(answers)
-    # if 'Trufflehog' in answers["tools"]:
-    #     trufflehog()
+    if 'Trufflehog' in answers["tools"]:
+         trufflehog()
     if 'Drozer' in answers["tools"]:
         run_drozer()
     if 'RMS(Runtime-Mobile-Security)' in answers["tools"]:
@@ -77,7 +79,8 @@ def trufflehog():
         os.system(f'trufflehog git file://{path} --json | jq . >> "trufflehog_report_local.json"')
         os.system("gedit trufflehog_report_local.json")
     if 'Github' in ans['gitOrLocal']:
-        os.system('trufflehog git https://github.com/StartupZmitac/ZMiTACinema.git --no-update --json | jq . >> "trufflehog_report_github.json')
+        link_input = input("Paste the Github Repo Link here!")
+        os.system(f'trufflehog git {link_input} --no-update --json | jq . >> "trufflehog_report_github.json"')
         os.system("gedit trufflehog_report_github.json")
     if not ans['gitOrLocal']:
         print("No options have been choosen")
@@ -103,7 +106,7 @@ def run_emulator():
     os.system('gnome-terminal -x emulator -avd Pixel_2_API_29')
     os.system("adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done;'")
     #while [ "`adb shell getprop sys.boot_completed | tr -d '\r' `" != "1" ] ; do sleep 1; done
-    print("koniec bootowania")
+    print("emulator is running")
     time.sleep(10)
 
 def check_if_ready():
@@ -115,6 +118,7 @@ def set_proxy():
     os.system('adb shell settings put global http_proxy "192.168.211.128:8080"')
 
 def run_drozer():
+    run_emulator()
     os.system('adb forward tcp:31415 tcp:31415')
     os.system('adb shell monkey -p com.mwr.dz -v 1')
     time.sleep(3)
@@ -134,7 +138,7 @@ def check_mobsf_status():
         return False
 
 def run_mobsf():
-    os.system('gnome-terminal -x sudo docker run -it --rm -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest')
+    os.system('gnome-terminal -x sudo docker run -it -p 8000:8000 opensecurity/mobile-security-framework-mobsf')
     #mobsf.upload('/home/andsec/Downloads/InsecureShop.apk')
     #mobsf.scan('apk', 'InsecureShop.apk', 'c5d872355e43322f1692288e2c4e6f00')
     #hash = check_output(args='md5sum /home/andsec/Downloads/InsecureShop.apk', shell=True).decode().split(' ')[0]
@@ -142,7 +146,7 @@ def run_mobsf():
     while(check_mobsf_status() == False):
         time.sleep(3)
         if check_mobsf_status():
-            print("MobSF is read.")
+            print("MobSF is ready.")
         else:
             print("MobSF is not ready.")
     path_to_file = get_apk_path()
@@ -156,6 +160,7 @@ def run_mobsf():
 
 def run_RMS():
     run_emulator()
+    subprocess.Popen("/home/andsec/Documents/program/andsec_program/reports/move_txt.sh", shell=True)
     os.system('rms')
 
 def andsec_main():
@@ -168,9 +173,9 @@ def andsec_main():
     #get_apk_path()
     #run_mobsf()
     #run_emulator()
-    #what_tool()
+    what_tool()
     #get_repo_path()
-    run_RMS()
+    #run_RMS()
 
 #main()
 

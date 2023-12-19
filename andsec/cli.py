@@ -3,7 +3,7 @@
 
 from typing import Optional
 import typer
-from andsec import __app_name__, __version__, welcome, run_emulator, run_drozer
+from andsec import __app_name__, __version__,what_tool ,welcome, run_emulator, run_drozer
 from typing_extensions import Annotated
 
 
@@ -14,7 +14,7 @@ def run(
     hello: bool = typer.Option(False, help="Run Welcome screen"),
     emulator: bool = typer.Option(False, help="Run Android emulator"),
     drozer: bool = typer.Option(False, help="Run Drozer tool"),
-    path: bool = typer.Option(False, help="Give apk path"),
+    path: str = typer.Option(False, help="Give apk path"),
 ):
     if hello:
         welcome()
@@ -25,6 +25,9 @@ def run(
     if drozer and path:
         run_drozer()
 
+@app.command(help="Command to run new user version")
+def graphical():
+    what_tool()
 
 def _version_callback(value: bool) -> None:
     if value:
