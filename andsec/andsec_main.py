@@ -55,35 +55,47 @@ def what_tool():
     answers = inquirer.prompt(questions)
     print(answers)
     if 'Trufflehog' in answers["tools"]:
-         trufflehog()
+         run_trufflehog()
     if 'Drozer' in answers["tools"]:
         run_drozer()
     if 'RMS(Runtime-Mobile-Security)' in answers["tools"]:
         run_RMS()
     if "MobSF" in answers["tools"]:
         run_mobsf()
+    if "Just Android Emulator" in answers["tools"]:
+        run_emulator()
+    if "Others" in answers["tools"]:
+        others_tab()
     
 
-def trufflehog():
-    q = [
-        inquirer.Checkbox(
-            "gitOrLocal",
-            message="Do You want to scan Ur local or github repo?",
-            choices=["Local", "Github"],
-            default=["Local"],
-        ),
-    ]
-    ans = inquirer.prompt(q, theme=BlueComposure())
-    if 'Local' in ans['gitOrLocal']:
-        path = get_repo_path()
-        os.system(f'trufflehog git file://{path} --json | jq . >> "trufflehog_report_local.json"')
-        os.system("gedit trufflehog_report_local.json")
-    if 'Github' in ans['gitOrLocal']:
-        link_input = input("Paste the Github Repo Link here!")
-        os.system(f'trufflehog git {link_input} --no-update --json | jq . >> "trufflehog_report_github.json"')
-        os.system("gedit trufflehog_report_github.json")
-    if not ans['gitOrLocal']:
-        print("No options have been choosen")
+def run_trufflehog(isGraphical = True, isLink = False, pathOrLink = ''):
+    if isGraphical == False:
+        if isLink == False:
+            os.system(f'trufflehog git file://{pathOrLink} --json | jq . >> "trufflehog_report_local.json"')
+            os.system("gedit trufflehog_report_local.json")
+        else:
+            os.system(f'trufflehog git {pathOrLink} --no-update --json | jq . >> "trufflehog_report_github.json"')
+            os.system("gedit trufflehog_report_github.json")
+    else:
+        q = [
+            inquirer.Checkbox(
+                "gitOrLocal",
+                message="Do You want to scan Ur local or github repo?",
+                choices=["Local", "Github"],
+                default=["Local"],
+            ),
+        ]
+        ans = inquirer.prompt(q, theme=BlueComposure())
+        if 'Local' in ans['gitOrLocal']:
+            path = get_repo_path()
+            os.system(f'trufflehog git file://{path} --json | jq . >> "trufflehog_report_local.json"')
+            os.system("gedit trufflehog_report_local.json")
+        if 'Github' in ans['gitOrLocal']:
+            link_input = input("Paste the Github Repo Link here!")
+            os.system(f'trufflehog git {link_input} --no-update --json | jq . >> "trufflehog_report_github.json"')
+            os.system("gedit trufflehog_report_github.json")
+        if not ans['gitOrLocal']:
+            print("No options have been choosen")
 
 def get_repo_path():
     question = inquirer.Path("directory", path_type=inquirer.Path.DIRECTORY, message="What is Ur repo's directory?"),
@@ -100,6 +112,24 @@ def get_apk_path():
     file_path = run_file_manager()
     print(file_path)
     return file_path
+
+def others_tab():
+    questions = [
+    inquirer.Checkbox(
+        "Others",
+        message="Some cool stuff",
+        choices=["Install apk on emulator", "Copy file to emulator", "Check documentation"],
+    ),
+    ]
+
+    answers = inquirer.prompt(questions)
+
+    if 'Install apk on emulator' in answers["Others"]:
+        print('in progress1')
+    if 'Copy file to emulator' in answers["Others"]:
+        print('in progress2')
+    if 'Check documentation' in answers["Others"]:
+        print('in progress3')
 
 def run_emulator():
     #os.system("emulator -avd Pixel_2_API_29 &")
@@ -137,8 +167,8 @@ def check_mobsf_status():
     except requests.ConnectionError:
         return False
 
-def run_mobsf():
-    os.system('gnome-terminal -x sudo docker run -it -p 8000:8000 opensecurity/mobile-security-framework-mobsf')
+def run_mobsf(path = ''):
+    os.system('gnome-terminal -x sudo docker run -p 8000:8000 opensecurity/mobile-security-framework-mobsf')
     #mobsf.upload('/home/andsec/Downloads/InsecureShop.apk')
     #mobsf.scan('apk', 'InsecureShop.apk', 'c5d872355e43322f1692288e2c4e6f00')
     #hash = check_output(args='md5sum /home/andsec/Downloads/InsecureShop.apk', shell=True).decode().split(' ')[0]
@@ -149,7 +179,10 @@ def run_mobsf():
             print("MobSF is ready.")
         else:
             print("MobSF is not ready.")
-    path_to_file = get_apk_path()
+    if path == '':
+        path_to_file = get_apk_path()
+    else:
+        path_to_file=path
     mobsf.upload(path_to_file)
     hash = check_output(args=f'md5sum {path_to_file}', shell=True).decode().split(' ')[0]
     mobsf.scan('apk', get_apk_name(), hash)
