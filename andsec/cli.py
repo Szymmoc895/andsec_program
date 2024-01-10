@@ -20,6 +20,9 @@ def run(
     path: Annotated[Optional[str], typer.Option(help="Give path to the apk file")] = None,
     install: bool = typer.Option(False, help="Install .apk on emulator"),
     RMS: bool = typer.Option(False, help="Run RMS tool"),
+    mitmweb: 
+    mitmproxy:
+    mitmdump
 ):
     if hello:
         welcome()

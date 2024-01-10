@@ -13,7 +13,8 @@ import requests
 
 from .file_manager import run_file_manager
 
-mobsf = MobSF('31cfac3b114d18c2943c4ac2c8554758f8be07f05aa97a84a1f9d40e020eaed3')
+mobsfApiKey = '31cfac3b114d18c2943c4ac2c8554758f8be07f05aa97a84a1f9d40e020eaed3'
+mobsf = MobSF(mobsfApiKey)
 
 __author__ = 'szymmoc895 ( @szymmoc895) '
 
@@ -53,7 +54,7 @@ def what_tool():
     ]
 
     answers = inquirer.prompt(questions)
-    print(answers)
+    #print(answers)
     if 'Trufflehog' in answers["tools"]:
          run_trufflehog()
     if 'Drozer' in answers["tools"]:
@@ -66,6 +67,8 @@ def what_tool():
         run_emulator()
     if "Others" in answers["tools"]:
         others_tab()
+    if "MITM" in answers["tools"]:
+        run_mitmproxy()
     
 
 def run_trufflehog(isGraphical = True, isLink = False, pathOrLink = ''):
@@ -167,8 +170,28 @@ def check_mobsf_status():
     except requests.ConnectionError:
         return False
 
+def run_mitmproxy():
+    questions = [
+    inquirer.Checkbox(
+        "mitm_version",
+        message="What mitmproxy version do you want to use?",
+        choices=["interactive", "web-based", "command-line"],
+        default=["interactive"],
+    ),
+    ]
+
+    answers = inquirer.prompt(questions)
+
+    if 'interactive' in answers["mitm_version"]:
+        os.system('gnome-terminal -- /home/andsec/Documents/testing_software/mitm/mitmproxy')
+    if 'web-based' in answers["mitm_version"]:
+        os.system('gnome-terminal -- /home/andsec/Documents/testing_software/mitm/mitmweb')
+    if 'command-line' in answers["mitm_version"]:
+        os.system('gnome-terminal -- /home/andsec/Documents/testing_software/mitm/mitmdump')
+
+
 def run_mobsf(path = ''):
-    os.system('gnome-terminal -x sudo docker run -p 8000:8000 opensecurity/mobile-security-framework-mobsf')
+    os.system(f'gnome-terminal -x sudo docker run -it -e {mobsfApiKey} -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest')
     #mobsf.upload('/home/andsec/Downloads/InsecureShop.apk')
     #mobsf.scan('apk', 'InsecureShop.apk', 'c5d872355e43322f1692288e2c4e6f00')
     #hash = check_output(args='md5sum /home/andsec/Downloads/InsecureShop.apk', shell=True).decode().split(' ')[0]
