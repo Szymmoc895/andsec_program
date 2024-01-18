@@ -3,7 +3,7 @@
 
 from typing import Optional, List
 import typer
-from andsec import __app_name__, __version__,what_tool ,welcome, run_emulator, run_drozer, run_trufflehog, run_mobsf, run_RMS
+from andsec import __app_name__, __version__,what_tool ,welcome, run_emulator, run_drozer, run_trufflehog, run_mobsf, run_RMS, run_mitmproxy
 from typing_extensions import Annotated
 
 
@@ -20,9 +20,9 @@ def run(
     path: Annotated[Optional[str], typer.Option(help="Give path to the apk file")] = None,
     install: bool = typer.Option(False, help="Install .apk on emulator"),
     RMS: bool = typer.Option(False, help="Run RMS tool"),
-    mitmweb: 
-    mitmproxy:
-    mitmdump
+    mitmweb: bool = typer.Option(False, help="Run web version of mitmproxy tool"),
+    mitmproxy: bool = typer.Option(False, help="Run interactive version of mitmproxy tool"),
+    mitmdump: bool = typer.Option(False, help="Run console version of mitmproxy tool"),
 ):
     if hello:
         welcome()
@@ -38,13 +38,19 @@ def run(
     if truffleLocal:
         run_trufflehog(False, False, truffleLocal)
     if mobsf and not path:
-        raise typer.Exit("--path is required when --drozer is used")
+        raise typer.Exit("--path is required when --mobsf is used")
     if mobsf and path:
         run_mobsf(path)
     if install:
         print("work in progress")
     if RMS:
         run_RMS()
+    if mitmweb:
+        run_mitmproxy("web")
+    if mitmproxy:
+        run_mitmproxy("proxy")
+    if mitmdump:
+        run_mitmproxy("command")
         
 
 @app.command(help="Command to run new user version")

@@ -170,7 +170,7 @@ def check_mobsf_status():
     except requests.ConnectionError:
         return False
 
-def run_mitmproxy():
+def run_mitmproxy(version = ""):
     questions = [
     inquirer.Checkbox(
         "mitm_version",
@@ -182,16 +182,16 @@ def run_mitmproxy():
 
     answers = inquirer.prompt(questions)
 
-    if 'interactive' in answers["mitm_version"]:
+    if 'interactive' in answers["mitm_version"] or version == "proxy":
         os.system('gnome-terminal -- /home/andsec/Documents/testing_software/mitm/mitmproxy')
-    if 'web-based' in answers["mitm_version"]:
+    if 'web-based' in answers["mitm_version"] or version == "web":
         os.system('gnome-terminal -- /home/andsec/Documents/testing_software/mitm/mitmweb')
-    if 'command-line' in answers["mitm_version"]:
+    if 'command-line' in answers["mitm_version"] or version == "command":
         os.system('gnome-terminal -- /home/andsec/Documents/testing_software/mitm/mitmdump')
 
 
 def run_mobsf(path = ''):
-    os.system(f'gnome-terminal -x sudo docker run -it -e {mobsfApiKey} -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest')
+    os.system(f'gnome-terminal -x sudo docker run -it -e MOBSF_API_KEY={mobsfApiKey} -p 8000:8000 opensecurity/mobile-security-framework-mobsf:latest')
     #mobsf.upload('/home/andsec/Downloads/InsecureShop.apk')
     #mobsf.scan('apk', 'InsecureShop.apk', 'c5d872355e43322f1692288e2c4e6f00')
     #hash = check_output(args='md5sum /home/andsec/Downloads/InsecureShop.apk', shell=True).decode().split(' ')[0]
@@ -216,7 +216,7 @@ def run_mobsf(path = ''):
 
 def run_RMS():
     run_emulator()
-    subprocess.Popen("/home/andsec/Documents/program/andsec_program/reports/move_txt.sh", shell=True)
+    subprocess.Popen("/home/andsec/Documents/program/andsec_program/reports/proba/move_txt.sh", shell=True)
     os.system('rms')
 
 def andsec_main():
